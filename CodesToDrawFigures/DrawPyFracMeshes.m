@@ -9,7 +9,7 @@ ylen=71;
 
 %Get to mesh dir...
 %Change this is you change the top level directory name
-FolderName='VelocityPaperUpdatedCodes';
+FolderName='AscentRatesOf3DFracturesCodes';
 
 %Get the address of the current working directory
 pathstring = pwd;      
