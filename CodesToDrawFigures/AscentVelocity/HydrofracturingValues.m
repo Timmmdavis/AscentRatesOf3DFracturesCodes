@@ -45,16 +45,6 @@ if VolumeIn<CriticalVolume
 end
 %Fracture size
 [v,Dn,c]=AscentVelocityApproximation(VolumeIn,deltagamma,mu,nu,eta);
-%Reynolds no:
-Re=(Dn*v*rho_f)/eta;
-if Re<2900 && Re>2300
-    disp('Flow is transitioning')
-elseif Re>2900
-    disp('Flow is turbulent')
-    disp(Re)
-else
-    disp('Flow is laminar')
-end
 
 %Solve for time to reach height 'x'
 HeightIn=2000;

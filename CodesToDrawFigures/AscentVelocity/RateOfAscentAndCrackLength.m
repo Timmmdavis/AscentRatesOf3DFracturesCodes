@@ -21,16 +21,5 @@ rate=(((1-nu).*delta_gamma^(3).*V.^(3))./(9^2.*pi.^(4).*mu.*eta.^(2).*t.^(4))).^
 
 tr=((3^(2)*pi^(8)*mu^(5)*eta^(4))/((1-nu)^(5)*delta_gamma^(9)*V^(3))).^(1/4);
 
-% %Removing the 2D head area from calc if desired and adding the head length
-% %to the fracture length (tail solution)
-% [v,Dn,c]=AscentVelocityApproximation(V,delta_gamma,mu,nu,eta);
-% A=2.*c.*Dn;
-% A0=((Kc^2*(1-nu))/(2*mu*delta_gamma)); 
-% At=A-A0;
-% cc=(Kc/(delta_gamma*sqrt(pi)))^(2/3);
-% h=((9.*At.^2.*delta_gamma.*t)./(16.*eta)).^(1/3);
-% h=h+cc; %Add head length
-% rate=gradient(h)./gradient(t); %Calculate rate
-
 
 end

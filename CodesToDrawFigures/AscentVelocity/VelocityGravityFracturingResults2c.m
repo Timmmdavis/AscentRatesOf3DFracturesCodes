@@ -56,7 +56,7 @@ for j=[2]%2:3
         InjectedMass=1950;
         injectionrate=0.015; %m3SECS
         injectiontime=130; %SECS
-        [FractureHeightPy, Times, VelocityPy,FractureHeightPySRC] = importCSVResults2('PyFracResult2_Long.csv');
+        [FractureHeightPy, Times, VelocityPy,FractureHeightPySRC] = importCSVResults2('PyFracResult2_LongNewPredCorr_Grid50NewFilter.csv');
        
     elseif Case==3
         %Case III
@@ -88,9 +88,12 @@ for j=[2]%2:3
     Times=Times(strt:end);
     VelocityPy=VelocityPy(strt:end);
 
+    %% Smooth
+    VelocityPy(1:end-3) = movmean(VelocityPy(1:end-3),40);
+
     [v,Dn,c]=AscentVelocityApproximation(VolumeIn,delta_gamma,mu,nu,eta);
     R=c*2;
-    plot(FractureHeightPy/R,VelocityPy,'color',col,'LineWidth',0.5)%,'-.'
+    plot(FractureHeightPy/R,VelocityPy,'color',col,'LineWidth',0.7)%,'-.'
     %plot(FractureHeight/R,Velocity,':','marker','.','color',col);
 
     %Time to get to 6c:
@@ -185,7 +188,7 @@ ylabel('Speed of upper tip, $v$ (m/s)','interpreter','latex')
 set(gca, 'YScale', 'log')
 WhiteFigure;
 
-xlim([0 5.25])
+xlim([0 5.5])
 ylim([10^-4 10^0])
 
 leg=legend({'$v$, numerical','$\tilde{v}_V$, analytical','$v_V(t)$, analytical'},'Interpreter','latex')%,'III PyFrac, V=0.375 m$^3$','III Salimzadeh et al','Max ascent velocity','Analytical velocity'},'Interpreter','latex');

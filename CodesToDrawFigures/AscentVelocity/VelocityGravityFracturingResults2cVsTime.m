@@ -56,7 +56,7 @@ for j=[2]%2:3
         InjectedMass=1950;
         injectionrate=0.015; %m3SECS
         injectiontime=130; %SECS
-        [FractureHeightPy, Times, VelocityPy,FractureHeightPySRC] = importCSVResults2('PyFracResult2_Long.csv');
+        [FractureHeightPy, Times, VelocityPy,FractureHeightPySRC] = importCSVResults2('PyFracResult2_LongNewPredCorr_Grid50NewFilter.csv');
        
     elseif Case==3
         %Case III
@@ -71,6 +71,9 @@ for j=[2]%2:3
        
    
     end
+
+
+
     [ K,E,lambda,nu,mu ] = ElasticConstantsCheck( E,nu );
     %Comp vars
     delta_gamma=rhon*g;
@@ -88,9 +91,13 @@ for j=[2]%2:3
     Times=Times(strt:end);
     VelocityPy=VelocityPy(strt:end);
 
+    %% Smooth
+    %VelocityPy(1:80) = movmean(VelocityPy(1:80),10); 
+    VelocityPy(1:end-3) = movmean(VelocityPy(1:end-3),40);
+
     [v,Dn,c]=AscentVelocityApproximation(VolumeIn,delta_gamma,mu,nu,eta);
     R=c*2;
-    plot(Times,VelocityPy,'color',col,'LineWidth',0.5)%,'-.'
+    plot(Times,VelocityPy,'color',col,'LineWidth',0.7)%,'-.'
     %plot(FractureHeight/R,Velocity,':','marker','.','color',col);
 
     %Time to get to 6c:
@@ -171,20 +178,22 @@ for j=[2]%2:3
         %text(42/R,0.0069,strcat(['2c',char(8594)]))
     end
 
-ttri=logspace(1,7,100);
-vtri=((0.33*ttri).^(-2/3));
+
+ttri=logspace(4.6,5.5,100);
+vtri=((0.4*ttri).^(-2/3));
+%[z,vtri,tr] = RateOfAscentAndCrackLength(V,ttri,delta_gamma,nu,mu,eta,Kc);
 plot(ttri,vtri,'-.k');
 
-ttri=logspace(3.4,4.2,100);
-vtri=((0.33*ttri).^(-2/3));
+ttri=logspace(4.9,5.3,100);
+vtri=((0.4*ttri).^(-2/3));
+%[z,vtri,tr] = RateOfAscentAndCrackLength(V,ttri,delta_gamma,nu,mu,eta,Kc);
 %plot(ttri,vtri,'k');
 plot([ttri(1),ttri(end)],[vtri(end) vtri(end)],'k');
 plot([ttri(1),ttri(1)],[vtri(1) vtri(end)],'k');
 plot(ttri,vtri,'-k');
 %text(mean(ttri),mean(vtri)*1.1,'$t^{-2/3}$',Interpreter='latex',rotation=-30,HorizontalAlignment='center')
-text(min(ttri)*0.9,mean(vtri),'$2$',Interpreter='latex',HorizontalAlignment='center')
-text(mean(ttri),min(vtri)*0.8,'$3$',Interpreter='latex',HorizontalAlignment='center')
-
+text(min(ttri)*0.9,mean(vtri)*1.,'$2$',Interpreter='latex',HorizontalAlignment='center')
+text(mean(ttri)*.9,min(vtri)*0.86,'$3$',Interpreter='latex',HorizontalAlignment='center')
  
 
 

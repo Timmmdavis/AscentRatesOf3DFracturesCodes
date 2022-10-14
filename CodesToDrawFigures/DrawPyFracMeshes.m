@@ -9,7 +9,7 @@ ylen=71;
 
 %Get to mesh dir...
 %Change this is you change the top level directory name
-FolderName='AscentRatesOf3DFracturesCodes';
+FolderName='SpeedForResubmissionAdditionalData';
 
 %Get the address of the current working directory
 pathstring = pwd;      
@@ -59,11 +59,27 @@ p=2*delta_gamma*c/3; %Davis 2020 GRL -> tail is closed K-=0
 P0=p;
 P1=delta_gamma;
 
+%Weertman length
+ch=(Kc/(delta_gamma*sqrt(pi)))^(2/3);
+ch=((3*sqrt(pi)*Kc)/(8*delta_gamma))^(2/3);%3D - davis 2020
+
+
+%Head vol - zero at base and Kc at penny SIDES
+clat=((6*sqrt(pi)*(Kc))/(8*delta_gamma))^(2/3);
+p=(2*delta_gamma*clat)/3;
+[Volume] = PennyCrackConstantPressure_Volume(nu,E,p,clat);
+
+Kprime=sqrt(2/pi)*Kc;
+Eprime=(1/pi)*(E/(1-nu^2));
+VolumeGara=0.408*(Kprime^(8/3))/(Eprime*delta_gamma^(5/3));
+
+
 %For cross sections
 Scl=20000;
 [CriticalVolume] = CriticalVolumeDavis2020(nu,mu,Kc,delta_gamma);
 %Convert to 2D area with approx...for cross sections:
 [v,Dn,c]=AscentVelocityApproximation(VolumeIn,delta_gamma,mu,nu,eta);
+[zGer,rateGer,heightGer,widthGer]=GaragashAndGermanovich2022Arxiv(Kc,E,nu,eta,delta_gamma,0,VolumeIn);
 A=2*c*Dn; %Area we start with
 A=A+((Kc^2*(1-nu))/(2*mu*delta_gamma)); %We remove this from the roper and lister func but! we use the whole tail vol in the sol
 xprofile=0;
@@ -72,6 +88,7 @@ xmv=c*3;
 data=load('PyFracSim2_Time600_Long.csv');
 x=data(:,1);y=data(:,2);widths=data(:,3);
 t=600;
+time(1)=t;
 xmvCross=xmv-c*1.4;
 [plt]=ReshapeAndDrawCrossSection(x,y,widths,xlen,xmvCross,xprofile,Scl,R);
 [cRL,zpnts,hpnts,zRL,hRL]=RoperAndListerConstantAreaSimilarity(A,delta_gamma,mu,nu,eta,Kc,t);
@@ -81,7 +98,7 @@ AreaDnAn2=AreaDnAn-((Kc^2*(1-nu))/(2*mu*delta_gamma))
 plot((hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 plot((-hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 scatter((hRL*Scl+xmvCross)/R,(zRL-InjD-cRL)/R,'.k');
-ReshapeAndDraw(x,y,widths,xlen,0,R,InjD);
+[~,HeadVol(1)]=ReshapeAndDraw(x,y,widths,xlen,0,R,InjD,ch);
 text(0/R,-(InjD*1.15)/R,'10 min','HorizontalAlignment', 'center','Interpreter','latex','color',[0 0 51]/255)
 text(0/R,-(InjD*1.23)/R,strcat('$V$ = ',num2str(VolumeIn),'m$^3$'),'HorizontalAlignment', 'center',Interpreter='latex')
 
@@ -97,49 +114,53 @@ text(0/R,-(InjD*1.23)/R,strcat('$V$ = ',num2str(VolumeIn),'m$^3$'),'HorizontalAl
 data=load('PyFracSim2_Time21600_Long.csv');
 x=data(:,1);y=data(:,2);widths=data(:,3);
 t=21600;
+time(2)=t;
 xmvCross=xmv*2-c*1.5;
 [plt]=ReshapeAndDrawCrossSection(x,y,widths,xlen,xmvCross,xprofile,Scl,R);
 [cRL,zpnts,hpnts,zRL,hRL]=RoperAndListerConstantAreaSimilarity(A,delta_gamma,mu,nu,eta,Kc,t);
 plot((hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 plot((-hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 scatter((hRL*Scl+xmvCross)/R,(zRL-InjD-cRL)/R,'.k');
-ReshapeAndDraw(x,y,widths,xlen,xmv,R,InjD);
+[~,HeadVol(2)]=ReshapeAndDraw(x,y,widths,xlen,xmv,R,InjD,ch);
 text((xmv)/R,-(InjD*1.15)/R,'6 h','HorizontalAlignment', 'center','Interpreter','latex','color',[0 0 153]/255)
 
 data=load('PyFracSim2_Time54000_Long.csv');
 x=data(:,1);y=data(:,2);widths=data(:,3);
 t=54000;
+time(3)=t;
 xmvCross=xmv*3-c*1.5;
 [plt]=ReshapeAndDrawCrossSection(x,y,widths,xlen,xmvCross,xprofile,Scl,R);
 [cRL,zpnts,hpnts,zRL,hRL]=RoperAndListerConstantAreaSimilarity(A,delta_gamma,mu,nu,eta,Kc,t);
 plot((hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 plot((-hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 scatter((hRL*Scl+xmvCross)/R,(zRL-InjD-cRL)/R,'.k');
-ReshapeAndDraw(x,y,widths,xlen,xmv*2,R,InjD);
+[~,HeadVol(3)]=ReshapeAndDraw(x,y,widths,xlen,xmv*2,R,InjD,ch);
 text((xmv*2)/R,-(InjD*1.15)/R,'15 h','HorizontalAlignment', 'center','Interpreter','latex','color',[0 0 255]/255)
 
 data=load('PyFracSim2_Time108000_Long.csv');
 x=data(:,1);y=data(:,2);widths=data(:,3);
 t=108000;
+time(4)=t;
 xmvCross=xmv*4-c*1.5;
 [plt]=ReshapeAndDrawCrossSection(x,y,widths,xlen,xmvCross,xprofile,Scl,R);
 [cRL,zpnts,hpnts,zRL,hRL]=RoperAndListerConstantAreaSimilarity(A,delta_gamma,mu,nu,eta,Kc,t);
 plot((hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 plot((-hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 scatter((hRL*Scl+xmvCross)/R,(zRL-InjD-cRL)/R,'.k');
-ReshapeAndDraw(x,y,widths,xlen,xmv*3,R,InjD);
+[~,HeadVol(4)]=ReshapeAndDraw(x,y,widths,xlen,xmv*3,R,InjD,ch);
 text((xmv*3)/R,-(InjD*1.15)/R,'30 h','HorizontalAlignment', 'center','Interpreter','latex','color',[102 102 255]/255)
 
 data=load('PyFracSim2_Time216000_Long.csv');
 x=data(:,1);y=data(:,2);widths=data(:,3);
 t=216000;
+time(5)=t;
 xmvCross=xmv*5-c*1.5;
 [plt]=ReshapeAndDrawCrossSection(x,y,widths,xlen,xmvCross,xprofile,Scl,R);
 [cRL,zpnts,hpnts,zRL,hRL]=RoperAndListerConstantAreaSimilarity(A,delta_gamma,mu,nu,eta,Kc,t);
 plot((hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 plot((-hpnts*Scl+xmvCross)/R,(zpnts-InjD-cRL)/R,'--k')
 scatter((hRL*Scl+xmvCross)/R,(zRL-InjD-cRL)/R,'.k');
-ReshapeAndDraw(x,y,widths,xlen,xmv*4,R,InjD);
+[~,HeadVol(5)]=ReshapeAndDraw(x,y,widths,xlen,xmv*4,R,InjD,ch);
 text((xmv*4)/R,-(InjD*1.15)/R,'60 h','HorizontalAlignment', 'center','Interpreter','latex','color',[153 153 255]/255)
 
 drawbrace([xmv*3.7 (max(zpnts)-InjD-cRL*4)]/R, [xmv*3.7 (max(zpnts)-InjD-cRL*2)]/R, 5, 'Color', 'k');
@@ -231,8 +252,6 @@ text((sind(45)*R/4)/R,(sind(45)*-R/4+zheight*1.7)/R,10,{'$a$'},'Interpreter','la
 %text( (c*1.65)/R,+zheight/R,{'3D analytical','length scale'},Interpreter='latex')
 
 
-
-
 %Draw analytical solution - cross section
 smpl=1000;
 rz=linspace(-c,c,smpl)';
@@ -265,12 +284,26 @@ caxis([0 Dn*2000])%2* Dn in mm
 ylim([(-InjD-R/1.5)/R 1])
 
 
-function [plt]=ReshapeAndDraw(x,y,widths,xlen,xmv,R,InjDepth)
+figure;hold on
+plot(time*0.000277778,HeadVol)
+hline(CriticalVolume,'k')
+xlabel('time hrs')
+ylabel('head vol m^3')
+legend('numerical vol','V_c')
+
+
+function [plt,HeadVol]=ReshapeAndDraw(x,y,widths,xlen,xmv,R,InjDepth,ch)
 
 X=reshape(x,xlen,[])+xmv;
 Y=reshape(y,xlen,[]);
 Wgrd=reshape(widths,xlen,[]);
 Wgrd=Wgrd*1000; %To mm!
+
+flag=Wgrd~=0;
+UpperTip=max(Y(flag));
+flag2=Y>UpperTip-2*ch & Y<UpperTip;
+HeadVol=sum(Wgrd(flag2))/1000;%Back to m's
+
 
 %Draw the outside.
 sz=(max(Y(:))-min(Y(:)))/1000; %m

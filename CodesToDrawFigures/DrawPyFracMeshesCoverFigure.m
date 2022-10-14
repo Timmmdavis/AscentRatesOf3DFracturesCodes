@@ -10,7 +10,7 @@ xmv=65;
 
 %Get to mesh dir...
 %Change this is you change the top level directory name
-FolderName='VelocityPaperUpdatedCodes';
+FolderName='VelocityPaperCodesResubmission';
 
 %Get the address of the current working directory
 pathstring = pwd;      
